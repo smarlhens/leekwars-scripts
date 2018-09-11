@@ -1,0 +1,7 @@
+function sendToAllies(type, enemy){
+    for (var ally in getAliveAllies()){
+        if(getLeek() !== ally && getFarmerID() === getFarmerID(ally)){
+            sendTo(ally, type, enemy);
+        }
+    }
+}

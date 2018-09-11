@@ -1,0 +1,96 @@
+/* ----------------------------- CODE ----------------------------- */
+include('utilities');
+include('message');
+include('util');
+
+function leekAI(){
+    var leader = getLeader();
+    var chips = getChips();
+    var weakestEnemy = getMyEnemy();
+    var strongestEnemy = getStrongestEnemy();
+    var leek = getLeek();
+
+    if(getTurn()==1){
+        init();
+    }
+
+    //var tmpEnemy = getEnemyFromLeader();
+    //if(tmpEnemy != null)
+    //weakestEnemy = tmpEnemy;
+
+    if(getLife() < (25*getTotalLife()/100)){
+        actionHeal(leek);
+    }
+
+    for (var chip in chips){
+        var effect = getChipEffects(chip)[0][0];
+        if((effect==EFFECT_ABSOLUTE_SHIELD ||
+        effect==EFFECT_ANTIDOTE ||
+        effect==EFFECT_BOOST_MAX_LIFE ||
+        effect==EFFECT_BUFF_AGILITY ||
+        effect==EFFECT_BUFF_FORCE||
+        effect==EFFECT_BUFF_RESISTANCE ||
+        effect==EFFECT_BUFF_STRENGTH ||
+        effect==EFFECT_RELATIVE_SHIELD) && canUseChip(chip, leek))
+        useChip(chip, leek);
+    }
+
+    //var bestForceChip = number(getRegister("bestForceChip"));
+    //var bestAgilityChip = number(getRegister("bestAgilityChip"));
+    //if(bestForceChip != null){
+    //if(canUseChip(bestForceChip, leek))
+    //useChip(bestForceChip, leek);
+    //}
+    //if(bestAgilityChip != null){
+    //if(canUseChip(bestAgilityChip, leek))
+    //useChip(bestAgilityChip, leek);
+    //}
+
+    summonBulb(leek, weakestEnemy);
+    //if(getRegister("bestSummonChip")!== null){
+    //var bestSummonChip = number(getRegister("bestSummonChip"));
+    //var ai = null;
+    //var n = randInt(0, 2);
+    //if(n == 0)
+    //ai = bulbKamikazeAI;
+    //else if(n == 1)
+    //ai = bulbBuffIA;
+    //mySummon(leek, weakestEnemy, bestSummonChip, ai);
+    //}
+
+    if(getLeek() == leader){
+        if(getAlliesCount() > 0){
+            sendToAllies(MESSAGE_ATTACK, weakestEnemy);
+        }
+    }
+
+    actionAttack(leek, weakestEnemy);
+    actionRunAway(strongestEnemy);
+
+    //var chipsDef = [];
+    //for (var i = 0; i < count(chips);i++) {
+    //var e = getChipEffects(chips[i]);
+    //if (e[0][0] == EFFECT_ABSOLUTE_SHIELD) {
+    //chipsDef[count(chipsDef)] = chips[i];
+    //}
+    //}
+    //var chipDef = bestChip(chipsDef, EFFECT_ABSOLUTE_SHIELD);
+    //do{
+    //if(canUseChip(chipDef, leek)){
+    //useChip(chipDef,leek);
+    //removeElement(chipsDef, chipDef);
+    //}
+    //chipDef = bestChip(chipsDef, EFFECT_ABSOLUTE_SHIELD);
+    //}while(!isEmpty(chipsDef) && chipDef!=null && getTP()>=getChipCost(chipDef));
+
+    if(getLife() > (25*getTotalLife()/100)){
+        actionHeal(leek);
+    }
+    //if(getTurn()==1)
+    statistics();
+
+    debug("Total operations : " + getOperations());
+    // endTurn();
+}
+
+/* ----------------------------- CODE ----------------------------- */

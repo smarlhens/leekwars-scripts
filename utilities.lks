@@ -1,62 +1,60 @@
-include('/CodeWeapon');
-include('/CodeChip');
-include('/CodeMessages');
-include("/CodeSummoner");
+include('/weapon');
+include('/chip');
+include('/summon');
 
 function init(){
     debugC("init", COLOR_BLUE);
-    var startNumOpe = getOperations();
     var chips = getChips();
+    setRegister("summonsCount", 0);
     setRegister("bestDamageChip", bestChip(chips, EFFECT_DAMAGE));
     setRegister("bestDamageRangeChip", bestRangeChip(chips, EFFECT_DAMAGE));
     setRegister("bestForceChip", bestChip(chips, EFFECT_BUFF_STRENGTH));
     setRegister("bestAgilityChip", bestChip(chips, EFFECT_BUFF_AGILITY));
     setRegister("bestSummonChip", bestChip(chips, EFFECT_SUMMON));
     setRegister("useChipDamage", true);
-    //debug("init cost : "+(getOperations() - startNumOpe)+" operations");
 }
 
 function statistics(){
-    //debugC("statistics", COLOR_BLUE);
-    var startNumOpe = getOperations();
-    var enemies = getEnemies();
-    for(var enemy in enemies){
-        if(enemy != null){
-            for(var weapon in getWeapons(enemy)){
-                var weaponName = "e_"+getWeaponName(weapon);
-                setRegister(weaponName, number(getRegister(weaponName) != null ? getRegister(weaponName) : 0)+1);
-            }
-            for(var chip in getChips(enemy)){
-                var chipName = "e_"+getChipName(chip);
-                setRegister(chipName, number(getRegister(chipName) != null ? getRegister(chipName) : 0)+1);
-            }
-        }
-    }
-    var allies = getAllies();
-    for(var ally in allies){
-        if(ally != null && ally != getLeek()){
-            for(var weapon in getWeapons(ally)){
-                var weaponName = "a_"+getWeaponName(weapon);
-                setRegister(weaponName, number(getRegister(weaponName) != null ? getRegister(weaponName) : 0)+1);
-            }
-            for(var chip in getChips(ally)){
-                var chipName = "a_"+getChipName(chip);
-                setRegister(chipName, number(getRegister(chipName) != null ? getRegister(chipName) : 0)+1);
-            }
-        }
-    }
+    // debugC("statistics", COLOR_BLUE);
+    // var startNumOpe = getOperations();
+    //var enemies = getEnemies();
+    //for(var enemy in enemies){
+    //if(enemy != null){
+    //for(var weapon in getWeapons(enemy)){
+    //var weaponName = "e_"+getWeaponName(weapon);
+    //setRegister(weaponName, number(getRegister(weaponName) != null ? getRegister(weaponName) : 0)+1);
+    //}
+    //for(var chip in getChips(enemy)){
+    //var chipName = "e_"+getChipName(chip);
+    //setRegister(chipName, number(getRegister(chipName) != null ? getRegister(chipName) : 0)+1);
+    //}
+    //}
+    //}
+    //var allies = getAllies();
+    //for(var ally in allies){
+    //if(ally != null && ally != getLeek()){
+    //for(var weapon in getWeapons(ally)){
+    //var weaponName = "a_"+getWeaponName(weapon);
+    //setRegister(weaponName, number(getRegister(weaponName) != null ? getRegister(weaponName) : 0)+1);
+    //}
+    //for(var chip in getChips(ally)){
+    //var chipName = "a_"+getChipName(chip);
+    //setRegister(chipName, number(getRegister(chipName) != null ? getRegister(chipName) : 0)+1);
+    //}
+    //}
+    //}
     if(getRegister("lowestTotalOperationsCost")==null || number(getRegister("lowestTotalOperationsCost")) > getOperations())
     setRegister("lowestTotalOperationsCost", getOperations());
     if(getRegister("highestTotalOperationsCost")==null || number(getRegister("highestTotalOperationsCost")) < getOperations())
     setRegister("highestTotalOperationsCost", getOperations());
-    //debug("statistics cost : "+(getOperations() - startNumOpe)+" operations");
+    // debug("statistics cost : "+(getOperations() - startNumOpe)+" operations");
 }
 
 function actionAttack(leek, enemy){
     debugC("actionAttack", COLOR_BLUE);
-    var startNumOpe = getOperations();
+    // var startNumOpe = getOperations();
     if(getWeapon()==null)
-    bestWeapon(enemy);
+    equipWeapon(getBestWeapon(enemy));
     var weapon = getWeapon();
     var bestDamageChip = number(getRegister("bestDamageChip"));
     var bestDamageRangeChip = number(getRegister("bestDamageRangeChip"));
@@ -68,7 +66,7 @@ function actionAttack(leek, enemy){
             actionAttackWithWeapon(leek, enemy);
             return;
         }else if(canUseWeapon(changeWeapon(weapon), enemy)){
-            setWeapon(changeWeapon(weapon));
+            equipWeapon(changeWeapon(weapon));
             actionAttackWithWeapon(leek, enemy);
             return;
         }else if (!canUseCurrentWeapon && canUseBestDamageChip){
@@ -81,16 +79,16 @@ function actionAttack(leek, enemy){
             moveToward(enemy,1);
         }
         else{
-            //debug("No move toward");
+            // debug("No move toward");
             return;
         }
     }
-    //debug("actionAttack cost : "+(getOperations() - startNumOpe)+" operations");
+    // debug("actionAttack cost : "+(getOperations() - startNumOpe)+" operations");
 }
 
 function actionRunAway(enemy){
-    //debugC("actionRunAway", COLOR_BLUE);
-    var startNumOpe = getOperations();
+    debugC("actionRunAway", COLOR_BLUE);
+    // var startNumOpe = getOperations();
     if(isAlive(enemy)){
         if(isOnSameLine(getCell(), getCell(enemy))){
             moveAwayFromLine(getCell(), getCell(enemy));
@@ -98,12 +96,12 @@ function actionRunAway(enemy){
             moveAwayFrom(enemy);
         }
     }
-    //debug("actionRunAway cost : "+(getOperations() - startNumOpe)+" operations");
+    // debug("actionRunAway cost : "+(getOperations() - startNumOpe)+" operations");
 }
 
 function shouldIMoveToAttack(leek, enemy){
-    //debugC("shouldIMoveToAttack", COLOR_BLUE);
-    var startNumOpe = getOperations();
+    debugC("shouldIMoveToAttack", COLOR_BLUE);
+    // var startNumOpe = getOperations();
     var sIMTA = false;
     var myCell = getCell();
     for(var weapon in getWeapons()){
@@ -126,13 +124,13 @@ function shouldIMoveToAttack(leek, enemy){
             }
         }
     }
-    //debug("shouldIMoveToAttack cost : "+(getOperations() - startNumOpe)+" operations");
+    // debug("shouldIMoveToAttack cost : "+(getOperations() - startNumOpe)+" operations");
     return sIMTA;
 }
 
 function actionHeal(leek){
-    //debugC("actionHeal", COLOR_BLUE);
-    var startNumOpe = getOperations();
+    debugC("actionHeal", COLOR_BLUE);
+    // var startNumOpe = getOperations();
     if(getLife()<getTotalLife()){
         var chips = getChips();
         var chipsHeal = [];
@@ -149,24 +147,25 @@ function actionHeal(leek){
             chipHeal = bestChip(chipsHeal, EFFECT_HEAL);
         }
     }
-    //debug("actionHeal cost : "+(getOperations() - startNumOpe)+" operations");
+    // debug("actionHeal cost : "+(getOperations() - startNumOpe)+" operations");
 }
 
 function actionAttackWithWeapon(leek, enemy){
-    //debugC("actionAttackWithWeapon", COLOR_BLUE);
-    var startNumOpe = getOperations();
-    bestWeapon(enemy);
+    debugC("actionAttackWithWeapon", COLOR_BLUE);
+    // var startNumOpe = getOperations();
+    equipWeapon(getBestWeapon(enemy));
     while( enemy != null && getTP() >= getWeaponCost(getWeapon()) && isAlive(enemy) && canUseWeapon(enemy) ){
         useWeapon(enemy);
         if(!isAlive(enemy)){
             enemy = getMyEnemy();
         }
     }
-    //debug("actionAttackWithWeapon cost : "+(getOperations() - startNumOpe)+" operations");
+    // debug("actionAttackWithWeapon cost : "+(getOperations() - startNumOpe)+" operations");
 }
+
 function actionAttackWithChip(leek, enemy, chipDamage){
-    //debugC("actionAttackWithChip", COLOR_BLUE);
-    var startNumOpe = getOperations();
+    debugC("actionAttackWithChip", COLOR_BLUE);
+    // var startNumOpe = getOperations();
     var enemyLifeBeforeChipEffect = getLife(enemy);
     while( enemy != null && getTP() >= getChipCost(chipDamage) && isAlive(enemy) && canUseChip(chipDamage, enemy) && getRegister("useChipDamage")){
         useChip(chipDamage, enemy);
@@ -178,12 +177,12 @@ function actionAttackWithChip(leek, enemy, chipDamage){
         debug("useChipDamage : false");
         setRegister("useChipDamage", false);
     }
-    //debug("actionAttackWithChip cost : "+(getOperations() - startNumOpe)+" operations");
+    // debug("actionAttackWithChip cost : "+(getOperations() - startNumOpe)+" operations");
 }
 
 function getWeakestEnemy(){
-    //debugC("getWeakestEnemy", COLOR_BLUE);
-    var startNumOpe = getOperations();
+    debugC("getWeakestEnemy", COLOR_BLUE);
+    // var startNumOpe = getOperations();
     var enemies = getAliveEnemies();
     var weakestEnemy = null;
 
@@ -200,13 +199,13 @@ function getWeakestEnemy(){
     if(weakestEnemy==null)
     weakestEnemy = getNearestEnemy();
 
-    //debug("getWeakestEnemy cost : "+(getOperations() - startNumOpe)+" operations");
+    // debug("getWeakestEnemy cost : "+(getOperations() - startNumOpe)+" operations");
     return weakestEnemy;
 }
 
 function getStrongestEnemy(){
-    //debugC("getStrongestEnemy", COLOR_BLUE);
-    var startNumOpe = getOperations();
+    debugC("getStrongestEnemy", COLOR_BLUE);
+    // var startNumOpe = getOperations();
     var enemies = getEnemies();
     var strongestEnemy = null;
 
@@ -223,13 +222,13 @@ function getStrongestEnemy(){
         }
     }
 
-    //debug("getStrongestEnemy cost : "+(getOperations() - startNumOpe)+" operations");
+    // debug("getStrongestEnemy cost : "+(getOperations() - startNumOpe)+" operations");
     return strongestEnemy;
 }
 
 function getMyEnemy(){
-    //debugC("getMyEnemy", COLOR_BLUE);
-    var startNumOpe = getOperations();
+    debugC("getMyEnemy", COLOR_BLUE);
+    // var startNumOpe = getOperations();
     var enemy = getWeakestEnemy();
     debug("weakest enemy : "+getName(enemy));
     if(enemy != null){
@@ -244,13 +243,13 @@ function getMyEnemy(){
                     pupute = ally;
                 }
             }
-            //debug("getMyEnemy cost : "+(getOperations() - startNumOpe)+" operations");
+            // debug("getMyEnemy cost : "+(getOperations() - startNumOpe)+" operations");
             if(pupute==null)
             return enemy;
             say("Puputerie !!!");
             return pupute;
         }else{
-            //debug("getMyEnemy cost : "+(getOperations() - startNumOpe)+" operations");
+            // debug("getMyEnemy cost : "+(getOperations() - startNumOpe)+" operations");
             return enemy;
         }
     }

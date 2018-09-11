@@ -1,6 +1,4 @@
 function bestRangeChip(tab, effect) {
-    //debugC("bestRangeChip", COLOR_BLUE);
-    var startNumOpe = getOperations();
     var c = null;
     for (var key : var value in tab) {
         var e = getChipEffects(value);
@@ -9,13 +7,10 @@ function bestRangeChip(tab, effect) {
             c = value;
         }
     }
-    //debug("bestRangeChip cost : "+(getOperations() - startNumOpe)+" operations");
     return c;
 }
 
 function bestChip(tab, effect) {
-    //debugC("bestChip", COLOR_BLUE);
-    var startNumOpe = getOperations();
     var c = null;
     for (var key : var value in tab) {
         var e = getChipEffects(value);
@@ -24,6 +19,5 @@ function bestChip(tab, effect) {
             c = value;
         }
     }
-    //debug("bestChip cost : "+(getOperations() - startNumOpe)+" operations");
     return c;
 }

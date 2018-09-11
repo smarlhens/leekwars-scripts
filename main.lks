@@ -1,3 +1,30 @@
-include("/CodeIA");
+include("ia");
 
 leekAI();
+
+/*
+ * TODO :
+ *  - team :
+ *	 - boost stronger ally
+ *	 - heal ally if needed
+ *   - send message of target to allies
+ *   - do not regroup leek
+ *   - bulb IA
+ *
+ * EASY
+ *  - Take into account enemy weapons (memorize them)
+ *  - Try to move away in priority (we can always move towards later)
+ *  - Taunt if we're winning (but don't waste action points)
+ *  - Function to check if we're safe (take into acount enemy movement)
+ *  - Function to check in how many MP the enemy is reachable
+ * MEDIUM
+ *  - Balance heals/attacks (right now we heal if we're low or critical)
+ *  - Sort weapons based on damage/cost ratio
+ * HARD
+ *  - Build a tree of possible actions to decide best damage throughoutput
+ *    - Get all possible actions in an array, sorted by highest damage
+ *    - Get the first elements of the array to construct our action list
+ * EXTREME
+ *  - Terrain awareness, use objects to our advantage
+ *  - Monte Carlo with known chips/weapons :D/
+ */

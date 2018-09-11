@@ -1,0 +1,46 @@
+include("bulb");
+
+global summonsRegisterName = "summonsCount";
+
+function getSummonChips(leek){
+    var summonChips = [];
+    for (var key : var chip in getChips(leek)) {
+        var e = getChipEffects(chip);
+        if (e[0][0] === EFFECT_SUMMON) {
+            push(summonChips, chip);
+        }
+    }
+    return arraySort(
+    summonChips,
+    function (a, b) {
+        return getChipCooldown(a) - getChipCooldown(b);
+    }
+    );
+}
+
+function getCellToSummon(leek, chip, enemy){
+    var cellToSummon = null;
+    for (var cell in getCellsToUseChip(chip, leek)){
+        if((cellToSummon === null || (null !== cellToSummon && getDistance(getCell(), cell) > 1 && getDistance(getCell(), cell) <= 4 && getDistance(cellToSummon, getCell(enemy)) > getDistance(cell, getCell(enemy)))))
+        cellToSummon = cell;
+    }
+    return cellToSummon;
+}
+
+function canSummon(){
+    return (number(null !== getRegister(summonsRegisterName) ? getRegister(summonsRegisterName) : 0) <= 4);
+}
+
+function summonBulb(leek, enemy){
+    var cellToSummon = null;
+    var summonChips = getSummonChips(leek);
+    for (var key : var chip in summonChips) {
+        if(null !== chip){
+            cellToSummon = getCellToSummon(leek, chip, enemy);
+            if(null !== cellToSummon && canSummon()){
+                summon(chip, cellToSummon, bulbKamikazeAI);
+                setRegister(summonsRegisterName, number(null !== getRegister(summonsRegisterName) ? getRegister(summonsRegisterName) : 0) + 1);
+            }
+        }
+    }
+}

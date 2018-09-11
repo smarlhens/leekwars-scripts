@@ -1,0 +1,86 @@
+function getLeader() {
+    var leader = null;
+
+    for (var ally in getAliveAllies()) {
+        if(getFarmerID() == getFarmerID(ally)) {
+            if(leader == null){
+                leader = ally;
+            } else if(getEntityTurnOrder(leader) > getEntityTurnOrder(ally)) {
+                leader = ally;
+            }
+        }
+    }
+
+    if(null === leader){
+        leader = getLeek();
+    }
+
+    debug("Leader : " + getName(leader));
+    return leader;
+}
+
+function getEnemyFromLeader(){
+    var enemy = null;
+    for (var m in getMessages()){
+        if(getMessageType(m) == MESSAGE_ATTACK){
+            if(getMessageParams(m)!= null){
+                enemy = number(getMessageParams(m));
+            }
+        }
+    }
+    return enemy;
+}
+
+function bulbKamikazeAI() {
+    var summoner = getSummoner();
+    var enemy = getEnemyFromLeader();
+    var leek = getLeek();
+    moveToward(enemy);
+
+    if(getOperations() < OPERATIONS_LIMIT){
+        if(getTP() >= getChipCost(CHIP_PEBBLE) && canUseChip(CHIP_PEBBLE, enemy) && isAlive(enemy))
+        useChip(CHIP_PEBBLE, enemy);
+
+        if(getTP() >= getChipCost(CHIP_BANDAGE) && canUseChip(CHIP_BANDAGE, summoner) && getLife(summoner)<getTotalLife(summoner))
+        useChip(CHIP_BANDAGE, summoner);
+        else if(getTP() >= getChipCost(CHIP_BANDAGE) && canUseChip(CHIP_BANDAGE, leek))
+        useChip(CHIP_BANDAGE, leek);
+
+        var n = randInt(0, 2);
+        if(n == 0){
+            if(getTP() >= getChipCost(CHIP_HELMET) && canUseChip(CHIP_HELMET, summoner))
+            useChip(CHIP_HELMET, summoner);
+        }
+        else if(n == 1){
+            if(getTP() >= getChipCost(CHIP_PROTEIN) && canUseChip(CHIP_PROTEIN, summoner))
+            useChip(CHIP_PROTEIN, summoner);
+        }
+    }
+}
+
+function bulbBuffIA(){
+    var summoner = getSummoner();
+    var enemy = getEnemyFromLeader();
+    var leek = getLeek();
+
+    if(getOperations() < OPERATIONS_LIMIT){
+        while(getMP() > 0 && getCellDistance(getCell(summoner), getCell())>3 && !isEmpty(getPath(getCell(summoner), getCell())))
+        moveToward(summoner,1);
+
+        if(getTP() >= getChipCost(CHIP_BANDAGE) && canUseChip(CHIP_BANDAGE, summoner) && getLife(summoner)<getTotalLife(summoner))
+        useChip(CHIP_BANDAGE, summoner);
+
+        var n = randInt(0, 2);
+        if(n == 0){
+            if(getTP() >= getChipCost(CHIP_HELMET) && canUseChip(CHIP_HELMET, summoner))
+            useChip(CHIP_HELMET, summoner);
+        }
+        else if(n == 1){
+            if(getTP() >= getChipCost(CHIP_PROTEIN) && canUseChip(CHIP_PROTEIN, summoner))
+            useChip(CHIP_PROTEIN, summoner);
+        }
+
+        if(getTP() >= getChipCost(CHIP_PEBBLE) && canUseChip(CHIP_PEBBLE, enemy) && isAlive(enemy))
+        useChip(CHIP_PEBBLE, enemy);
+    }
+}
