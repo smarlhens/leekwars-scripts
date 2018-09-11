@@ -1,0 +1,19 @@
+function endTurn(){
+//debugC("endTurn", COLOR_BLUE);
+var startNumOpe = getOperations();
+var tab = ["Salut !",
+"Comment vas-tu ?",
+"Moi c'est " + getName(),
+"J'ai " + getLife() + " PV"
+"Je suis level "+ getLevel(),
+"Je suis élevé par " + getFarmerName(),
+"Je suis sur la case " + getCell(),
+"Sais-tu que l'on peut mettre du poireau dans la soupe ?"];
+while(getTP()> 0 && count(tab)> 0){
+var pos = randInt(0, count(tab)- 1);
+if(tab[pos] != null && tab[pos] != "")
+say(tab[pos]);
+remove(tab, pos);
+}
+//debug("endTurn cost : "+(getOperations() - startNumOpe)+" operations");
+}

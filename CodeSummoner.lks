@@ -1,0 +1,12 @@
+function mySummon(leek,enemy,chip, ai){
+    //debugC("mySummon", COLOR_BLUE);
+    var myCell = null;
+    for (var cell in getCellsToUseChip(chip, leek)){
+        if(myCell == null || (myCell != null && getDistance(getCell(), cell)>1 && getDistance(getCell(), cell)<=4 && getDistance(myCell, getCell(enemy))>getDistance(cell, getCell(enemy))))
+        myCell = cell;
+    }
+    //debug("getcell() : "+getCell()+" myCell : "+myCell);
+    if(myCell != null){
+        summon(chip, myCell,ai);
+    }
+}

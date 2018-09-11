@@ -1,0 +1,59 @@
+function getLeader(){
+    //debugC("getLeader", COLOR_BLUE);
+    var startNumOpe = getOperations();
+    var leader = null;
+
+    for (var ally in getAliveAllies()){
+        if(getFarmerID() == getFarmerID(ally)){
+            if(leader == null)
+            leader = ally;
+            else if(getEntityTurnOrder(leader)>getEntityTurnOrder(ally))
+            leader = ally;
+        }
+    }
+
+    if(leader == null)
+    leader = getLeek();
+
+    debug("Leader : "+getName(leader));
+    //debug("getLeader cost : "+(getOperations() - startNumOpe)+" operations");
+    return leader;
+}
+
+function getEnemyFromLeader(){
+    //debugC("getEnemyFromLeader", COLOR_BLUE);
+    var startNumOpe = getOperations();
+    var enemy = null;
+    for (var m in getMessages()){
+        if(getMessageType(m) == MESSAGE_ATTACK){
+            if(getMessageParams(m)!= null){
+                enemy = number(getMessageParams(m));
+            }
+        }
+    }
+
+    //debug("getEnemyFromLeader cost : "+(getOperations() - startNumOpe)+" operations");
+    return enemy;
+}
+
+function sendToAllies(type, enemy){
+    //debugC("sendToAllies", COLOR_BLUE);
+    var startNumOpe = getOperations();
+    for (var ally in getAliveAllies()){
+        if(ally != getLeek() && getFarmerID() == getFarmerID(ally)){
+            sendTo(ally, type, enemy);
+        }
+    }
+    //debug("sendToAllies cost : "+(getOperations() - startNumOpe)+" operations");
+}
+
+function sendToBulbs(type, enemy){
+    //debugC("sendToBulbs", COLOR_BLUE);
+    var startNumOpe = getOperations();
+    for (var ally in getAliveAllies()){
+        if(ally != getLeek() && getFarmerID() == getFarmerID(ally) && isSummon(ally)){
+            sendTo(ally, type, enemy);
+        }
+    }
+    //debug("sendToBulbs cost : "+(getOperations() - startNumOpe)+" operations");
+}

@@ -1,0 +1,44 @@
+function bestWeapon(enemy){
+    //debugC("bestWeapon", COLOR_BLUE);
+    var startNumOpe = getOperations();
+    var canUseWeapon0 = canUseWeapon(getWeapons()[0], enemy);
+    var canUseWeapon1 = canUseWeapon(getWeapons()[1], enemy);
+    var weaponDiff0 = getWeapon()!=getWeapons()[0];
+    var weaponDiff1 = getWeapon()!=getWeapons()[1];
+    if(canUseWeapon0 && canUseWeapon1){
+        if(getWeaponEffects(getWeapons()[0])[2]>getWeaponEffects(getWeapons()[1])[2]){
+            if(weaponDiff0)
+            setWeapon(getWeapons()[0]);
+        }else{
+            if(weaponDiff1)
+            setWeapon(getWeapons()[1]);
+        }
+    }else if(canUseWeapon0 && !canUseWeapon1){
+        if(weaponDiff0)
+        setWeapon(getWeapons()[0]);
+    }else if(!canUseWeapon0 && canUseWeapon1){
+        if(weaponDiff1)
+        setWeapon(getWeapons()[1]);
+    }
+    //else{
+    //if(getWeaponMaxRange(getWeapons()[0])>getWeaponMaxRange(getWeapons()[1])){
+    //if(weaponDiff0)
+    //setWeapon(getWeapons()[0]);
+    //}
+    //else{
+    //if(weaponDiff1)
+    //setWeapon(getWeapons()[1]);
+    //}
+    //}
+    //debug("bestWeapon cost : "+(getOperations() - startNumOpe)+" operations");
+}
+
+function changeWeapon(myWeapon){
+    //debugC("changeWeapon", COLOR_BLUE);
+    var startNumOpe = getOperations();
+    for(var weapon in getWeapons()){
+        if(weapon!=myWeapon)
+        return weapon;
+    }
+    //debug("changeWeapon cost : "+(getOperations() - startNumOpe)+" operations");
+}

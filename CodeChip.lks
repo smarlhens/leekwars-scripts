@@ -1,0 +1,29 @@
+function bestRangeChip(tab, effect) {
+    //debugC("bestRangeChip", COLOR_BLUE);
+    var startNumOpe = getOperations();
+    var c = null;
+    for (var key : var value in tab) {
+        var e = getChipEffects(value);
+        if (e[0][0] == effect) {
+            if(c==null || getChipMaxRange(value)>getChipMaxRange(c))
+            c = value;
+        }
+    }
+    //debug("bestRangeChip cost : "+(getOperations() - startNumOpe)+" operations");
+    return c;
+}
+
+function bestChip(tab, effect) {
+    //debugC("bestChip", COLOR_BLUE);
+    var startNumOpe = getOperations();
+    var c = null;
+    for (var key : var value in tab) {
+        var e = getChipEffects(value);
+        if (e[0][0] == effect) {
+            if(c==null || getChipEffects(value)[2]>getChipEffects(c)[2])
+            c = value;
+        }
+    }
+    //debug("bestChip cost : "+(getOperations() - startNumOpe)+" operations");
+    return c;
+}
