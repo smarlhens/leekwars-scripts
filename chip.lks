@@ -2,8 +2,8 @@ function bestRangeChip(tab, effect) {
     var c = null;
     for (var key : var value in tab) {
         var e = getChipEffects(value);
-        if (e[0][0] == effect) {
-            if(c==null || getChipMaxRange(value)>getChipMaxRange(c))
+        if (e[0][0] === effect) {
+            if(null === c || getChipMaxRange(value)>getChipMaxRange(c))
             c = value;
         }
     }
@@ -14,8 +14,8 @@ function bestChip(tab, effect) {
     var c = null;
     for (var key : var value in tab) {
         var e = getChipEffects(value);
-        if (e[0][0] == effect) {
-            if(c==null || getChipEffects(value)[2]>getChipEffects(c)[2])
+        if (e[0][0] === effect) {
+            if(null === c || getChipEffects(value)[2] > getChipEffects(c)[2])
             c = value;
         }
     }

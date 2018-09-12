@@ -1,0 +1,96 @@
+//--------------------------------
+//------------ ia ----------------
+//--------------------------------
+
+/*
+ * if turn eq 1
+ *  - init :
+ *		- get best chip : EFFECT_DAMAGE
+ *	  	- get best range chip : EFFECT_DAMAGE
+ *	  	- get best chip : EFFECT_BUFF_STRENGTH
+ *	  	- get best chip : EFFECT_BUFF_AGILITY
+ *	  	- get best chip : EFFECT_SUMMON
+ *
+ * if life lt 25% of total life
+ *  - heal :
+ *		- get chips : EFFECT_HEAL
+ *    	- loop on chips : EFFECT_HEAL
+ *			- get best chip : EFFECT_HEAL
+ *			- use best chip : EFFECT_HEAL
+ *
+ * use as many chips as possible :
+ *  - EFFECT_ABSOLUTE_SHIELD
+ *	- EFFECT_ANTIDOTE
+ *	- EFFECT_BOOST_MAX_LIFE
+ *	- EFFECT_BUFF_AGILITY
+ *	- EFFECT_BUFF_FORCE
+ *	- EFFECT_BUFF_RESISTANCE
+ *	- EFFECT_BUFF_STRENGTH
+ *	- EFFECT_RELATIVE_SHIELD
+ *
+ * summon bulb :
+ *	- get chips : EFFECT_SUMMON
+ *	- sort by cooldown ASC
+ *	- loop on chips : EFFECT_SUMMON
+ *		- get cell to summon
+ * 		- if number of summon lte 4
+ *			- summon
+ *
+ * if leek is the leader
+ *  - send target to allies : MESSAGE_ATTACK
+ *
+ * attack :
+ *	- equip best weapon
+ *	- while true
+ *		- if can use current weapon :
+ *			- equip best weapon
+ *			- while enemy is alive and can use weapon :
+ *				- use weapon on enemy
+ *				- if enemy is die :
+ *					- get new enemy
+ *		- else if can use different weapon :
+ *			- equip weapon
+ *			- equip best weapon
+ *			- while enemy is alive and can use weapon :
+ *				- use weapon on enemy
+ *				- if enemy is die :
+ *					- get new enemy
+ *		- else if can't use current weapon and can use damage chip :
+ *			- while enemy is alive and can use damage chip :
+ *				- if register useChipDamage is true :
+ *					- use chip
+ *				- if enemy is die :
+ *					- get new enemy
+ *				- if enemy is not lt than before :
+ *					- set register useChipDamage to false
+ *		- else if can't use current weapon and can use range damage chip :
+ *			- while enemy is alive and can use range damage chip :
+ *				- if register useChipDamage is true :
+ *					- use chip
+ *				- if enemy is die :
+ *					- get new enemy
+ *				- if enemy is not lt than before :
+ *					- set register useChipDamage to false
+ *		- else if should i move to attack and (enemy alive and distance with enemy gt 8) :
+ *			- move torward enemy
+ *		- else :
+ * 			- return
+ *
+ * run away :
+ *	- if enemy is alive :
+ * 		- if is on same line with enemy :
+ *			- move away from line
+ *		- else :
+ *			- move away from enemy
+ *
+ * if life lt 25% of total life
+ *  - heal :
+ *		- get chips : EFFECT_HEAL
+ *    	- loop on chips : EFFECT_HEAL
+ *			- get best chip : EFFECT_HEAL
+ *			- use best chip : EFFECT_HEAL
+ *
+ * statistics :
+ *  - get total operations
+ *
+ */

@@ -154,7 +154,7 @@ function actionAttackWithWeapon(leek, enemy){
     debugC("actionAttackWithWeapon", COLOR_BLUE);
     // var startNumOpe = getOperations();
     equipWeapon(getBestWeapon(enemy));
-    while( enemy != null && getTP() >= getWeaponCost(getWeapon()) && isAlive(enemy) && canUseWeapon(enemy) ){
+    while(enemy != null && getTP() >= getWeaponCost(getWeapon()) && isAlive(enemy) && canUseWeapon(enemy) ){
         useWeapon(enemy);
         if(!isAlive(enemy)){
             enemy = getMyEnemy();
@@ -232,23 +232,24 @@ function getMyEnemy(){
     var enemy = getWeakestEnemy();
     debug("weakest enemy : "+getName(enemy));
     if(enemy != null){
-        if(getAliveEnemiesCount() == 1 && count(getAliveAllies()) > 1 && getLife()>getLife(enemy)){
+        if(getAliveEnemiesCount() === 1 && count(getAliveAllies()) > 1 && getLife() > getLife(enemy)){
             var pupute = null;
             var myCell = getCell();
             for(var ally in getAliveAllies()){
-                if (isAlive(ally)  && getFarmerID() != getFarmerID(ally)){
-                    if(pupute == null)
+                if (isAlive(ally)  && getFarmerID() !== getFarmerID(ally)){
+                    if(null === pupute)
                     pupute = ally;
-                    else if(pupute != null && getPathLength(myCell, getCell(pupute))>getPathLength(myCell,getCell(ally)))
+                    else if(null !== pupute && getPathLength(myCell, getCell(pupute)) > getPathLength(myCell,getCell(ally)))
                     pupute = ally;
                 }
             }
             // debug("getMyEnemy cost : "+(getOperations() - startNumOpe)+" operations");
-            if(pupute==null)
-            return enemy;
+            if(null === pupute){
+                return enemy;
+            }
             say("Puputerie !!!");
             return pupute;
-        }else{
+        } else {
             // debug("getMyEnemy cost : "+(getOperations() - startNumOpe)+" operations");
             return enemy;
         }
