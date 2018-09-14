@@ -1,0 +1,21 @@
+function getClosestCellToUse(item, leek){
+    debugC("getClosestCellToUse", COLOR_BLUE);
+    if(null !== item){
+        var cells = [];
+        if(isWeapon(item)){
+            cells = getCellsToUseWeapon(item, leek);
+        }else if(isChip(item)){
+            cells = getCellsToUseChip(item, leek);
+        }
+        var current = getCell();
+        var closest = null;
+        for(var cell in cells){
+            if(null === closest
+            || (null !== closest && getPathLength(current, cell) < getPathLength(current, closest))){
+                closest = cell;
+            }
+        }
+        return closest;
+    }
+    return null;
+}

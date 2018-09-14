@@ -5,16 +5,17 @@ include('/summon');
 function init(){
     debugC("init", COLOR_BLUE);
     var chips = getChips();
-    setRegister("summonsCount", 0);
+    setRegister("canSummon", true);
     setRegister("bestDamageChip", bestChip(chips, EFFECT_DAMAGE));
     setRegister("bestDamageRangeChip", bestRangeChip(chips, EFFECT_DAMAGE));
     setRegister("bestForceChip", bestChip(chips, EFFECT_BUFF_STRENGTH));
     setRegister("bestAgilityChip", bestChip(chips, EFFECT_BUFF_AGILITY));
-    setRegister("bestSummonChip", bestChip(chips, EFFECT_SUMMON));
+    // setRegister("bestSummonChip", bestChip(chips, EFFECT_SUMMON));
     setRegister("useChipDamage", true);
 }
 
 function statistics(){
+    debugC("statistics", COLOR_BLUE);
     // debugC("statistics", COLOR_BLUE);
     // var startNumOpe = getOperations();
     //var enemies = getEnemies();
@@ -52,63 +53,56 @@ function statistics(){
 
 function actionAttack(leek, enemy){
     debugC("actionAttack", COLOR_BLUE);
-    // var startNumOpe = getOperations();
-    if(getWeapon()==null)
-    equipWeapon(getBestWeapon(enemy));
-    var weapon = getWeapon();
+    //if(null !== getWeapon())
+    //	equipWeapon(getBestWeapon(enemy));
     var bestDamageChip = number(getRegister("bestDamageChip"));
     var bestDamageRangeChip = number(getRegister("bestDamageRangeChip"));
-    while (true) {
-        var canUseCurrentWeapon = canUseWeapon(weapon, enemy);
-        var canUseBestDamageChip = canUseChip(bestDamageChip, enemy) && getRegister("useChipDamage") && getTP()>getChipCost(bestDamageChip);
-        var canUseBestDamageRangeChip = canUseChip(bestDamageRangeChip, enemy) && getRegister("useChipDamage") && getTP()>getChipCost(bestDamageRangeChip);
-        if(canUseCurrentWeapon){
-            actionAttackWithWeapon(leek, enemy);
-            return;
-        }else if(canUseWeapon(changeWeapon(weapon), enemy)){
-            equipWeapon(changeWeapon(weapon));
-            actionAttackWithWeapon(leek, enemy);
-            return;
-        }else if (!canUseCurrentWeapon && canUseBestDamageChip){
-            actionAttackWithChip(leek, enemy, bestDamageChip);
-        }
-        else if(!canUseCurrentWeapon && canUseBestDamageRangeChip){
-            actionAttackWithChip(leek, enemy, bestDamageRangeChip);
-        }
-        else if((shouldIMoveToAttack(leek, enemy)|| (isAlive(enemy) && getDistance(getCell(), getCell(enemy)) > 8)) && getMP() > 0){
-            moveToward(enemy,1);
-        }
-        else{
-            // debug("No move toward");
-            return;
-        }
+    //while (getTP() > 0) {
+    if(null === enemy){
+        enemy = getMyEnemy();
     }
-    // debug("actionAttack cost : "+(getOperations() - startNumOpe)+" operations");
+    equipWeapon(getBestWeapon(enemy));
+    var canUseCurrentWeapon = canUseWeapon(getWeapon(), enemy) && getTP() >= getWeaponCost(getWeapon());
+    var canUseBestDamageChip = canUseChip(bestDamageChip, enemy) && getRegister("useChipDamage") && getTP() >= getChipCost(bestDamageChip);
+    var canUseBestDamageRangeChip = canUseChip(bestDamageRangeChip, enemy) && getRegister("useChipDamage") && getTP() >= getChipCost(bestDamageRangeChip);
+    if(canUseCurrentWeapon){
+        actionAttackWithWeapon(leek, enemy);
+        actionAttack(leek, enemy);
+    }else if(!canUseCurrentWeapon && canUseBestDamageChip){
+        actionAttackWithChip(leek, enemy, bestDamageChip);
+        actionAttack(leek, enemy);
+    }else if(!canUseCurrentWeapon && canUseBestDamageRangeChip){
+        actionAttackWithChip(leek, enemy, bestDamageRangeChip);
+        actionAttack(leek, enemy);
+    }else if((shouldIMoveToAttack(leek, enemy) || (isAlive(enemy) && getPathLength(getCell(), getCell(enemy)) > 8)) && getMP() > 0 && !canUseCurrentWeapon && !canUseBestDamageChip && !canUseBestDamageRangeChip && isTPsAvailableForFight([getWeapon(), bestDamageChip, bestDamageRangeChip])){
+        moveToward(enemy, 1);
+        actionAttack(leek, enemy);
+    }else{
+        debug("No move toward");
+        return;
+    }
+    //}
 }
 
 function actionRunAway(enemy){
     debugC("actionRunAway", COLOR_BLUE);
-    // var startNumOpe = getOperations();
     if(isAlive(enemy)){
         if(isOnSameLine(getCell(), getCell(enemy))){
             moveAwayFromLine(getCell(), getCell(enemy));
         }else{
-            moveAwayFrom(enemy);
+            moveAwayFromLeeks(getEnemies());
         }
     }
-    // debug("actionRunAway cost : "+(getOperations() - startNumOpe)+" operations");
 }
 
 function shouldIMoveToAttack(leek, enemy){
     debugC("shouldIMoveToAttack", COLOR_BLUE);
-    // var startNumOpe = getOperations();
     var sIMTA = false;
     var myCell = getCell();
     for(var weapon in getWeapons()){
         var cellsToUseWeapon = getCellsToUseWeapon(weapon, enemy);
         for(var cell in cellsToUseWeapon){
-            if(getDistance(myCell, cell) <= getMP() && getCellContent(cell)==null
-            &&	!isEmpty(getPath(myCell, cell)))
+            if(getPathLength(myCell, cell) <= getMP() && null === getCellContent(cell) && !isEmpty(getPath(myCell, cell)))
             return sIMTA = true;
         }
     }
@@ -118,19 +112,17 @@ function shouldIMoveToAttack(leek, enemy){
             if (e[0][0] == EFFECT_DAMAGE) {
                 var cellsToUseChip = getCellsToUseChip(chip, enemy);
                 for(var cell in cellsToUseChip){
-                    if(getDistance(myCell, cell) <= getMP() && getCellContent(cell)==null && !isEmpty(getPath(myCell, cell)))
+                    if(getPathLength(myCell, cell) <= getMP() && null === getCellContent(cell) && !isEmpty(getPath(myCell, cell)))
                     return sIMTA = true;
                 }
             }
         }
     }
-    // debug("shouldIMoveToAttack cost : "+(getOperations() - startNumOpe)+" operations");
     return sIMTA;
 }
 
 function actionHeal(leek){
     debugC("actionHeal", COLOR_BLUE);
-    // var startNumOpe = getOperations();
     if(getLife()<getTotalLife()){
         var chips = getChips();
         var chipsHeal = [];
@@ -147,71 +139,67 @@ function actionHeal(leek){
             chipHeal = bestChip(chipsHeal, EFFECT_HEAL);
         }
     }
-    // debug("actionHeal cost : "+(getOperations() - startNumOpe)+" operations");
 }
 
 function actionAttackWithWeapon(leek, enemy){
     debugC("actionAttackWithWeapon", COLOR_BLUE);
-    // var startNumOpe = getOperations();
-    equipWeapon(getBestWeapon(enemy));
-    while(enemy != null && getTP() >= getWeaponCost(getWeapon()) && isAlive(enemy) && canUseWeapon(enemy) ){
+    while(enemy != null && getTP() >= getWeaponCost(getWeapon())
+    && isAlive(enemy) && canUseWeapon(enemy) ){
         useWeapon(enemy);
         if(!isAlive(enemy)){
             enemy = getMyEnemy();
         }
     }
-    // debug("actionAttackWithWeapon cost : "+(getOperations() - startNumOpe)+" operations");
 }
 
 function actionAttackWithChip(leek, enemy, chipDamage){
     debugC("actionAttackWithChip", COLOR_BLUE);
-    // var startNumOpe = getOperations();
     var enemyLifeBeforeChipEffect = getLife(enemy);
-    while( enemy != null && getTP() >= getChipCost(chipDamage) && isAlive(enemy) && canUseChip(chipDamage, enemy) && getRegister("useChipDamage")){
+    while(null !== enemy && getTP() >= getChipCost(chipDamage)
+    && isAlive(enemy) && canUseChip(chipDamage, enemy)
+    && getRegister("useChipDamage")){
         useChip(chipDamage, enemy);
+        if(!isAlive(enemy)){
+            enemy = getMyEnemy();
+        }
+        if(enemyLifeBeforeChipEffect === getLife(enemy)){
+            debug("useChipDamage : false");
+            setRegister("useChipDamage", false);
+            return;
+        }
     }
-    if(!isAlive(enemy)){
-        enemy = getMyEnemy();
-    }
-    if(enemyLifeBeforeChipEffect==getLife(enemy)){
-        debug("useChipDamage : false");
-        setRegister("useChipDamage", false);
-    }
-    // debug("actionAttackWithChip cost : "+(getOperations() - startNumOpe)+" operations");
 }
 
 function getWeakestEnemy(){
     debugC("getWeakestEnemy", COLOR_BLUE);
-    // var startNumOpe = getOperations();
     var enemies = getAliveEnemies();
     var weakestEnemy = null;
-
     for(var enemy in enemies){
-        if(isAlive(enemy) && getDistance(getCell(enemy), getLeek()) <= getMP() && !isSummon(enemy)){
-            if(weakestEnemy == null)
-            weakestEnemy = enemy;
-            else{
-                if(getResistance(weakestEnemy) < getResistance(enemy))
+        if(isAlive(enemy)
+        && getPathLength(getCell(enemy), getLeek()) <= getMP()
+        && !isSummon(enemy)){
+            if(null === weakestEnemy){
+                weakestEnemy = enemy;
+            } else if(null !== weakestEnemy
+            && getResistance(weakestEnemy) < getResistance(enemy)){
                 weakestEnemy = enemy;
             }
         }
     }
-    if(weakestEnemy==null)
-    weakestEnemy = getNearestEnemy();
-
-    // debug("getWeakestEnemy cost : "+(getOperations() - startNumOpe)+" operations");
+    if(null === weakestEnemy){
+        weakestEnemy = getNearestEnemy();
+    }
     return weakestEnemy;
 }
 
 function getStrongestEnemy(){
     debugC("getStrongestEnemy", COLOR_BLUE);
-    // var startNumOpe = getOperations();
     var enemies = getEnemies();
     var strongestEnemy = null;
 
     for(var enemy in enemies){
         if(isAlive(enemy)){
-            if(strongestEnemy == null)
+            if(null === strongestEnemy)
             strongestEnemy = enemy;
             else{
                 if((getEffects(strongestEnemy)[EFFECT_BUFF_AGILITY]+getEffects(strongestEnemy)[EFFECT_BUFF_AGILITY]) < (getEffects(enemy)[EFFECT_BUFF_AGILITY]+getEffects(enemy)[EFFECT_BUFF_AGILITY]))
@@ -221,36 +209,33 @@ function getStrongestEnemy(){
             strongestEnemy = getNearestEnemy();
         }
     }
-
-    // debug("getStrongestEnemy cost : "+(getOperations() - startNumOpe)+" operations");
     return strongestEnemy;
 }
 
 function getMyEnemy(){
     debugC("getMyEnemy", COLOR_BLUE);
-    // var startNumOpe = getOperations();
     var enemy = getWeakestEnemy();
     debug("weakest enemy : "+getName(enemy));
-    if(enemy != null){
-        if(getAliveEnemiesCount() === 1 && count(getAliveAllies()) > 1 && getLife() > getLife(enemy)){
+    if(enemy !== null){
+        if(getAliveEnemiesCount() === 1
+        && count(getAliveAllies()) > 1 && getLife() > getLife(enemy)){
             var pupute = null;
             var myCell = getCell();
             for(var ally in getAliveAllies()){
-                if (isAlive(ally)  && getFarmerID() !== getFarmerID(ally)){
+                if (isAlive(ally) && getFarmerID() !== getFarmerID(ally)){
                     if(null === pupute)
                     pupute = ally;
-                    else if(null !== pupute && getPathLength(myCell, getCell(pupute)) > getPathLength(myCell,getCell(ally)))
+                    else if(null !== pupute
+                    && getPathLength(myCell, getCell(pupute)) > getPathLength(myCell,getCell(ally)))
                     pupute = ally;
                 }
             }
-            // debug("getMyEnemy cost : "+(getOperations() - startNumOpe)+" operations");
             if(null === pupute){
                 return enemy;
             }
             say("Puputerie !!!");
             return pupute;
         } else {
-            // debug("getMyEnemy cost : "+(getOperations() - startNumOpe)+" operations");
             return enemy;
         }
     }

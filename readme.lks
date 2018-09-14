@@ -9,14 +9,20 @@
  *	  	- get best range chip : EFFECT_DAMAGE
  *	  	- get best chip : EFFECT_BUFF_STRENGTH
  *	  	- get best chip : EFFECT_BUFF_AGILITY
- *	  	- get best chip : EFFECT_SUMMON
  *
  * if life lt 25% of total life
  *  - heal :
  *		- get chips : EFFECT_HEAL
- *    	- loop on chips : EFFECT_HEAL
- *			- get best chip : EFFECT_HEAL
- *			- use best chip : EFFECT_HEAL
+ *    	- loop on chips :
+ *			- get best chip
+ *			- use best chip
+ * else
+ *	- head wounded ally :
+ *		- get ally which life lt 50% sort by life
+ *		- if can heal :
+ *			- heal
+ *		- else :
+ *			- move torward closest cell to use heal cheap
  *
  * use as many chips as possible :
  *  - EFFECT_ABSOLUTE_SHIELD
@@ -33,57 +39,53 @@
  *	- sort by cooldown ASC
  *	- loop on chips : EFFECT_SUMMON
  *		- get cell to summon
- * 		- if number of summon lte 4
- *			- summon
+ * 		- if can use chip on cell and register canSummon
+ *			- summon :
+ *				- if result is TOO_MANY set register canSummon to false
  *
  * if leek is the leader
  *  - send target to allies : MESSAGE_ATTACK
  *
  * attack :
  *	- equip best weapon
- *	- while true
- *		- if can use current weapon :
- *			- equip best weapon
- *			- while enemy is alive and can use weapon :
- *				- use weapon on enemy
- *				- if enemy is die :
- *					- get new enemy
- *		- else if can use different weapon :
- *			- equip weapon
- *			- equip best weapon
- *			- while enemy is alive and can use weapon :
- *				- use weapon on enemy
- *				- if enemy is die :
- *					- get new enemy
- *		- else if can't use current weapon and can use damage chip :
- *			- while enemy is alive and can use damage chip :
- *				- if register useChipDamage is true :
- *					- use chip
- *				- if enemy is die :
- *					- get new enemy
- *				- if enemy is not lt than before :
- *					- set register useChipDamage to false
- *		- else if can't use current weapon and can use range damage chip :
- *			- while enemy is alive and can use range damage chip :
- *				- if register useChipDamage is true :
- *					- use chip
- *				- if enemy is die :
- *					- get new enemy
- *				- if enemy is not lt than before :
- *					- set register useChipDamage to false
- *		- else if should i move to attack and (enemy alive and distance with enemy gt 8) :
- *			- move torward enemy
- *		- else :
- * 			- return
+ *	- if can use current weapon :
+ *		- while enemy is alive and can use weapon :
+ *			- use weapon on enemy
+ *			- if enemy is die :
+ *				- get new enemy
+ *		- attack()
+ *	- else if can't use current weapon and can use damage chip :
+ *		- while enemy is alive and can use damage chip :
+ *			- if register useChipDamage is true :
+ *				- use chip
+ *			- if enemy is die :
+ *				- get new enemy
+ *			- if enemy is not lt than before :
+ *				- set register useChipDamage to false
+ *		- attack()
+ *	- else if can't use current weapon and can use range damage chip :
+ *		- while enemy is alive and can use range damage chip :
+ *			- if register useChipDamage is true :
+ *				- use chip
+ *			- if enemy is die :
+ *				- get new enemy
+ *			- if enemy is not lt than before :
+ *				- set register useChipDamage to false
+ *		- attack()
+ *	- else if should i move to attack and (enemy alive and distance with enemy gt 8) and can't use current weapon and damage chips but got TPs :
+ *		- move torward enemy
+ *		- attack()
+ *	- else :
+ * 		- return
  *
  * run away :
  *	- if enemy is alive :
  * 		- if is on same line with enemy :
  *			- move away from line
  *		- else :
- *			- move away from enemy
+ *			- move away from enemies
  *
- * if life lt 25% of total life
+ * if life lt total life
  *  - heal :
  *		- get chips : EFFECT_HEAL
  *    	- loop on chips : EFFECT_HEAL

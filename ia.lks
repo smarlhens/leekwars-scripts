@@ -1,9 +1,10 @@
-/* ----------------------------- CODE ----------------------------- */
 include('utilities');
 include('message');
 include('util');
+include('team');
 
 function leekAI(){
+    debugC("leekAI", COLOR_BLUE);
     var leader = getLeader();
     var chips = getChips();
     var weakestEnemy = getMyEnemy();
@@ -14,12 +15,10 @@ function leekAI(){
         init();
     }
 
-    //var tmpEnemy = getEnemyFromLeader();
-    //if(tmpEnemy != null)
-    //weakestEnemy = tmpEnemy;
-
     if(getLife() < (25*getTotalLife()/100)){
         actionHeal(leek);
+    }else{
+        healWoundedAlly();
     }
 
     for (var chip in chips){
@@ -35,28 +34,7 @@ function leekAI(){
         useChip(chip, leek);
     }
 
-    //var bestForceChip = number(getRegister("bestForceChip"));
-    //var bestAgilityChip = number(getRegister("bestAgilityChip"));
-    //if(bestForceChip != null){
-    //if(canUseChip(bestForceChip, leek))
-    //useChip(bestForceChip, leek);
-    //}
-    //if(bestAgilityChip != null){
-    //if(canUseChip(bestAgilityChip, leek))
-    //useChip(bestAgilityChip, leek);
-    //}
-
     summonBulb(leek, weakestEnemy);
-    //if(getRegister("bestSummonChip")!== null){
-    //var bestSummonChip = number(getRegister("bestSummonChip"));
-    //var ai = null;
-    //var n = randInt(0, 2);
-    //if(n == 0)
-    //ai = bulbKamikazeAI;
-    //else if(n == 1)
-    //ai = bulbBuffIA;
-    //mySummon(leek, weakestEnemy, bestSummonChip, ai);
-    //}
 
     if(getLeek() === leader && getAlliesCount() > 0){
         sendToAllies(MESSAGE_ATTACK, weakestEnemy);
@@ -65,23 +43,7 @@ function leekAI(){
     actionAttack(leek, weakestEnemy);
     actionRunAway(strongestEnemy);
 
-    //var chipsDef = [];
-    //for (var i = 0; i < count(chips);i++) {
-    //var e = getChipEffects(chips[i]);
-    //if (e[0][0] == EFFECT_ABSOLUTE_SHIELD) {
-    //chipsDef[count(chipsDef)] = chips[i];
-    //}
-    //}
-    //var chipDef = bestChip(chipsDef, EFFECT_ABSOLUTE_SHIELD);
-    //do{
-    //if(canUseChip(chipDef, leek)){
-    //useChip(chipDef,leek);
-    //removeElement(chipsDef, chipDef);
-    //}
-    //chipDef = bestChip(chipsDef, EFFECT_ABSOLUTE_SHIELD);
-    //}while(!isEmpty(chipsDef) && chipDef!=null && getTP()>=getChipCost(chipDef));
-
-    if(getLife() > (25*getTotalLife()/100)){
+    if(getLife() < getTotalLife()){
         actionHeal(leek);
     }
     //if(getTurn()==1)
@@ -90,5 +52,3 @@ function leekAI(){
     debug("Total operations : " + getOperations());
     // endTurn();
 }
-
-/* ----------------------------- CODE ----------------------------- */

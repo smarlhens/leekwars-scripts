@@ -1,4 +1,5 @@
 function endTurn(){
+    debugC("endTurn", COLOR_BLUE);
     var tab = ["Salut !",
     "Comment vas-tu ?",
     "Moi c'est "+getName(),

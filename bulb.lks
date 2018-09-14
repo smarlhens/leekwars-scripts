@@ -1,4 +1,5 @@
 function getLeader() {
+    debugC("getLeader", COLOR_BLUE);
     var leader = null;
 
     for (var ally in getAliveAllies()) {
@@ -20,6 +21,7 @@ function getLeader() {
 }
 
 function getEnemyFromLeader(){
+    debugC("getEnemyFromLeader", COLOR_BLUE);
     var enemy = null;
     for (var m in getMessages()){
         if(getMessageType(m) == MESSAGE_ATTACK){
@@ -32,55 +34,73 @@ function getEnemyFromLeader(){
 }
 
 function bulbKamikazeAI() {
+    debugC("bulbKamikazeAI", COLOR_BLUE);
     var summoner = getSummoner();
     var enemy = getEnemyFromLeader();
     var leek = getLeek();
     moveToward(enemy);
 
     if(getOperations() < OPERATIONS_LIMIT){
-        if(getTP() >= getChipCost(CHIP_PEBBLE) && canUseChip(CHIP_PEBBLE, enemy) && isAlive(enemy))
-        useChip(CHIP_PEBBLE, enemy);
+        if(null !== enemy
+        && getTP() >= getChipCost(CHIP_PEBBLE)
+        && canUseChip(CHIP_PEBBLE, enemy) && isAlive(enemy)){
+            useChip(CHIP_PEBBLE, enemy);
+        }
 
-        if(getTP() >= getChipCost(CHIP_BANDAGE) && canUseChip(CHIP_BANDAGE, summoner) && getLife(summoner)<getTotalLife(summoner))
-        useChip(CHIP_BANDAGE, summoner);
-        else if(getTP() >= getChipCost(CHIP_BANDAGE) && canUseChip(CHIP_BANDAGE, leek))
-        useChip(CHIP_BANDAGE, leek);
+        if(getTP() >= getChipCost(CHIP_BANDAGE)
+        && canUseChip(CHIP_BANDAGE, summoner)
+        && getLife(summoner)<getTotalLife(summoner)){
+            useChip(CHIP_BANDAGE, summoner);
+        }else if(getTP() >= getChipCost(CHIP_BANDAGE)
+        && canUseChip(CHIP_BANDAGE, leek)){
+            useChip(CHIP_BANDAGE, leek);
+        }
 
         var n = randInt(0, 2);
-        if(n == 0){
-            if(getTP() >= getChipCost(CHIP_HELMET) && canUseChip(CHIP_HELMET, summoner))
+        if(n == 0
+        && getTP() >= getChipCost(CHIP_HELMET)
+        && canUseChip(CHIP_HELMET, summoner)){
             useChip(CHIP_HELMET, summoner);
         }
-        else if(n == 1){
-            if(getTP() >= getChipCost(CHIP_PROTEIN) && canUseChip(CHIP_PROTEIN, summoner))
+        else if(n == 1
+        && getTP() >= getChipCost(CHIP_PROTEIN)
+        && canUseChip(CHIP_PROTEIN, summoner)){
             useChip(CHIP_PROTEIN, summoner);
         }
     }
 }
 
 function bulbBuffIA(){
+    debugC("bulbBuffIA", COLOR_BLUE);
     var summoner = getSummoner();
     var enemy = getEnemyFromLeader();
     var leek = getLeek();
 
     if(getOperations() < OPERATIONS_LIMIT){
-        while(getMP() > 0 && getCellDistance(getCell(summoner), getCell())>3 && !isEmpty(getPath(getCell(summoner), getCell())))
-        moveToward(summoner,1);
+        while(getMP() > 0
+        && getCellDistance(getCell(summoner), getCell())>3
+        && !isEmpty(getPath(getCell(summoner), getCell()))){
+            moveToward(summoner, 1);
+        }
 
-        if(getTP() >= getChipCost(CHIP_BANDAGE) && canUseChip(CHIP_BANDAGE, summoner) && getLife(summoner)<getTotalLife(summoner))
-        useChip(CHIP_BANDAGE, summoner);
+        if(getTP() >= getChipCost(CHIP_BANDAGE)
+        && canUseChip(CHIP_BANDAGE, summoner)
+        && getLife(summoner)<getTotalLife(summoner)){
+            useChip(CHIP_BANDAGE, summoner);
+        }
 
         var n = randInt(0, 2);
-        if(n == 0){
-            if(getTP() >= getChipCost(CHIP_HELMET) && canUseChip(CHIP_HELMET, summoner))
+        if(n == 0 && getTP() >= getChipCost(CHIP_HELMET)
+        && canUseChip(CHIP_HELMET, summoner)){
             useChip(CHIP_HELMET, summoner);
-        }
-        else if(n == 1){
-            if(getTP() >= getChipCost(CHIP_PROTEIN) && canUseChip(CHIP_PROTEIN, summoner))
+        }else if(n == 1 && getTP() >= getChipCost(CHIP_PROTEIN)
+        && canUseChip(CHIP_PROTEIN, summoner)){
             useChip(CHIP_PROTEIN, summoner);
         }
 
-        if(getTP() >= getChipCost(CHIP_PEBBLE) && canUseChip(CHIP_PEBBLE, enemy) && isAlive(enemy))
-        useChip(CHIP_PEBBLE, enemy);
+        if(null !== enemy && getTP() >= getChipCost(CHIP_PEBBLE)
+        && canUseChip(CHIP_PEBBLE, enemy) && isAlive(enemy)){
+            useChip(CHIP_PEBBLE, enemy);
+        }
     }
 }

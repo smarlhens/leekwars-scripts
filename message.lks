@@ -1,4 +1,5 @@
 function sendToAllies(type, enemy){
+    debugC("sendToAllies", COLOR_BLUE);
     for (var ally in getAliveAllies()){
         if(getLeek() !== ally && getFarmerID() === getFarmerID(ally)){
             sendTo(ally, type, enemy);

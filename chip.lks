@@ -1,4 +1,5 @@
 function bestRangeChip(tab, effect) {
+    debugC("bestRangeChip", COLOR_BLUE);
     var c = null;
     for (var key : var value in tab) {
         var e = getChipEffects(value);
@@ -11,6 +12,7 @@ function bestRangeChip(tab, effect) {
 }
 
 function bestChip(tab, effect) {
+    debugC("bestChip", COLOR_BLUE);
     var c = null;
     for (var key : var value in tab) {
         var e = getChipEffects(value);

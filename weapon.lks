@@ -1,16 +1,18 @@
-function changeWeapon(myWeapon)
-{
-    // debugC("changeWeapon", COLOR_BLUE);
-    // var startNumOpe = getOperations();
-    for(var weapon in getWeapons()){
-        if(weapon !== myWeapon)
-        return weapon;
+function isTPsAvailableForFight(weapons){
+    debugC("isTPsAvailableForFight", COLOR_BLUE);
+    for(var weapon in weapons){
+        if(null !== weapon &&
+        ((isWeapon(weapon) && getTP() >= getWeaponCost(weapon))
+        || (isChip(weapon) && getTP() >= getChipCost(weapon)))){
+            return true;
+        }
     }
-    // debug("changeWeapon cost : "+(getOperations() - startNumOpe)+" operations");
+    return false;
 }
 
 function getDamageEffect(weapon)
 {
+    debugC("getDamageEffect", COLOR_BLUE);
     // [type, min, max, turns, targets]
     var effects = getWeaponEffects(weapon);
 
@@ -23,12 +25,14 @@ function getDamageEffect(weapon)
 
 function getWeaponAverageDamage(weapon)
 {
+    debugC("getWeaponAverageDamage", COLOR_BLUE);
     var effect = getDamageEffect(weapon);
     return (effect[1] + effect[2]) / 2;
 }
 
 function equipWeapon(weapon)
 {
+    debugC("equipWeapon", COLOR_BLUE);
     if(null !== weapon && getWeapon() !== weapon) {
         debug("WEAPON: " + getWeaponName(weapon));
         setWeapon(weapon);
@@ -37,6 +41,7 @@ function equipWeapon(weapon)
 
 function getBestWeapon(enemy)
 {
+    debugC("getBestWeapon", COLOR_BLUE);
     var weapons = getWeapons();
     var best = null;
     var bestDamage = 0;
@@ -46,37 +51,38 @@ function getBestWeapon(enemy)
 
     var me = getCell();
     var them = getCell(enemy);
+    if(null !== them){
+        for (var i = 0; i < count(weapons); i++) {
+            var cur = weapons[i];
 
-    for (var i = 0; i < count(weapons); i++) {
-        var cur = weapons[i];
+            // check if we can fire this weapon now
+            if (isInlineWeapon(cur) and !isOnSameLine(me, them))
+            continue;
+            // check line of sight
+            if (weaponNeedLos(cur) and !lineOfSight(me, them))
+            continue;
+            // check range
+            if (getCellDistance(me, them) > getWeaponMaxRange(cur))
+            continue;
 
-        // check if we can fire this weapon now
-        if (isInlineWeapon(cur) and !isOnSameLine(me, them))
-        continue;
-        // check line of sight
-        if (weaponNeedLos(cur) and !lineOfSight(me, them))
-        continue;
-        // check range
-        if (getCellDistance(me, them) > getWeaponMaxRange(cur))
-        continue;
+            // calculate the damage for this weapon
+            var damage = getWeaponAverageDamage(cur); // [type, min, max, ...]
+            var switch = (getWeapon() == cur ? 0 : 1); // cost for switch
+            var turns = floor((tp - switch) / getWeaponCost(cur));
 
-        // calculate the damage for this weapon
-        var damage = getWeaponAverageDamage(cur); // [type, min, max, ...]
-        var switch = (getWeapon() == cur ? 0 : 1); // cost for switch
-        var turns = floor((tp - switch) / getWeaponCost(cur));
+            damage *= turns;
 
-        damage *= turns;
-
-        debug(getWeaponName(cur) + " would deal " + damage + " damage for " + turns + " turns");
-        if (damage > bestDamage)
-        {
-            bestDamage = damage;
-            bestTurns = turns;
-            best = cur;
+            debug(getWeaponName(cur) + " would deal " + damage + " damage for " + turns + " turns");
+            if (damage > bestDamage)
+            {
+                bestDamage = damage;
+                bestTurns = turns;
+                best = cur;
+            }
         }
     }
 
-    debug("BEST: " + getWeaponName(best) + ", with " + bestDamage + " average for " + bestTurns + " turns");
+    debugC("BEST: " + getWeaponName(best) + ", with " + bestDamage + " average for " + bestTurns + " turns", COLOR_GREEN);
 
     return best;
 }

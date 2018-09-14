@@ -1,8 +1,9 @@
 include("bulb");
 
-global summonsRegisterName = "summonsCount";
+global summonsRegisterName = "canSummon";
 
 function getSummonChips(leek){
+    debugC("getSummonChips", COLOR_BLUE);
     var summonChips = [];
     for (var key : var chip in getChips(leek)) {
         var e = getChipEffects(chip);
@@ -19,27 +20,31 @@ function getSummonChips(leek){
 }
 
 function getCellToSummon(leek, chip, enemy){
+    debugC("getCellToSummon", COLOR_BLUE);
     var cellToSummon = null;
     for (var cell in getCellsToUseChip(chip, leek)){
-        if((cellToSummon === null || (null !== cellToSummon && getDistance(getCell(), cell) > 1 && getDistance(getCell(), cell) <= 4 && getDistance(cellToSummon, getCell(enemy)) > getDistance(cell, getCell(enemy)))))
+        if((cellToSummon === null || (null !== cellToSummon && getPathLength(getCell(), cell) > 1 && getPathLength(getCell(), cell) <= 4 && getPathLength(cellToSummon, getCell(enemy)) > getPathLength(cell, getCell(enemy)))))
         cellToSummon = cell;
     }
     return cellToSummon;
 }
 
-function canSummon(){
-    return (number(null !== getRegister(summonsRegisterName) ? getRegister(summonsRegisterName) : 0) <= 4);
-}
-
 function summonBulb(leek, enemy){
+    debugC("summonBulb", COLOR_BLUE);
     var cellToSummon = null;
     var summonChips = getSummonChips(leek);
     for (var key : var chip in summonChips) {
         if(null !== chip){
             cellToSummon = getCellToSummon(leek, chip, enemy);
-            if(null !== cellToSummon && canSummon()){
-                summon(chip, cellToSummon, bulbKamikazeAI);
-                setRegister(summonsRegisterName, number(null !== getRegister(summonsRegisterName) ? getRegister(summonsRegisterName) : 0) + 1);
+            if(null !== cellToSummon
+            && canUseChipOnCell(chip, cellToSummon)
+            && getRegister(summonsRegisterName)){
+                var summonResult = summon(chip, cellToSummon, bulbKamikazeAI);
+                if(summonResult === USE_SUCCESS){
+                    setRegister(summonsRegisterName, true);
+                }else if (summonResult === USE_TOO_MANY_SUMMONS){
+                    setRegister(summonsRegisterName, false);
+                }
             }
         }
     }

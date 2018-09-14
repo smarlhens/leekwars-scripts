@@ -1,0 +1,63 @@
+include('chip');
+include('cell');
+
+var alliesLife = [];
+
+function getAllyToHeal(){
+    debugC("getAllyToHeal", COLOR_BLUE);
+    var allies = getAliveAllies();
+    var alliesToHeal = [];
+    for(var key : var ally in allies){
+        var distance = getPathLength(getCell(), getCell(ally));
+        var percentageOfAllyLife = (getLife(ally) * 100 / getTotalLife(ally));
+        if(ally !== getLeek() && !isSummon(ally)
+        && distance < getMP() && percentageOfAllyLife < 50){
+            push(alliesToHeal, ally);
+        }
+    }
+    return arraySort(
+    alliesToHeal,
+    function (a, b) {
+        return getLife(a) - getLife(b);
+    }
+    )[0];
+}
+
+function healWoundedAlly(){
+    debugC("healWoundedAlly", COLOR_BLUE);
+    var ally = getAllyToHeal();
+    if(null !== ally){
+        debugC('emergency : ' + getName(ally), COLOR_GREEN);
+        var chips = getChips();
+        var chipsHeal = [];
+        for (var i = 0; i < count(chips); i++) {
+            var e = getChipEffects(chips[i]);
+            if (e[0][0] == EFFECT_HEAL) {
+                chipsHeal[count(chipsHeal)] = chips[i];
+            }
+        }
+        var chipHeal = bestChip(chipsHeal, EFFECT_HEAL);
+        while(!isEmpty(chipsHeal) && null !== chipHeal
+        && getTP() >= getChipCost(chipHeal)){
+            if(canUseChip(chipHeal, ally)){
+                useChip(chipHeal, ally);
+                removeElement(chipsHeal, chipHeal);
+                chipHeal = bestChip(chipsHeal, EFFECT_HEAL);
+            }else{
+                var closest = getClosestCellToUse(chipHeal, ally);
+                debugW('closest : '+closest);
+                if(null !== closest){
+                    var pathLength = getPathLength(getCell(), closest);
+                    debugW('path : '+pathLength);
+                    if(null !== pathLength && pathLength <= getMP()){
+                        moveToward(ally, pathLength);
+                    }else{
+                        return;
+                    }
+                }else{
+                    return;
+                }
+            }
+        }
+    }
+}
